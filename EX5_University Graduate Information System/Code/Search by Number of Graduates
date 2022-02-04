@@ -1,0 +1,477 @@
+// 10927202 陽彩柔  10927212 趙珀
+#include<iostream>
+#include<fstream>  // ifstream
+#include<vector>
+
+using namespace std ;
+
+struct Data ;
+
+string file_name ;
+bool open = true ; // check the file exist
+bool use_cmd1_first = false ;
+bool exist = false ; // check the school name exist
+
+bool is_Num( string str ) ;
+void readfile( vector<Data> &list ) ;
+string GetNum();
+void print( vector<Data> new_list ) ;
+void deleteData( vector<Data> &list , vector<Data>delete_List ) ;
+
+struct Data {
+
+ string Name ;
+ string Department_name ;
+ string Type;
+ string Level;
+ int num_students;
+ int num_professors;
+ int num_graduates;
+
+}; // job
+
+class TreeNode{
+ public:
+     TreeNode *left = NULL ;
+     TreeNode *right = NULL ;
+     Data data;
+}; // TreeNode
+
+class BST {
+ public:
+   TreeNode *current = NULL;
+   TreeNode *root1  ;
+   TreeNode *root2  ;
+   int name_tree_height = 0 ;
+   int num_tree_height = 0 ;
+   vector<Data> list;
+ 
+ void NameInsertBST( vector<Data> list ){
+   
+   root1 = NULL ;
+   int i = 0 ;
+ 
+   while ( i < list.size() ) {
+     current = root1;
+     
+     if (current == NULL) {
+       current = new TreeNode() ;
+       current->data = list[i];
+       root1 = current ;
+     } // if
+     
+     else {
+       while (true){
+         if ( current->data.Name > list[i].Name  ){
+           if(current->left == NULL){
+             current->left = new TreeNode();
+             current->left->data = list[i];
+             current = current->left ;
+             
+             break;
+           } // if
+           else
+             current = current->left;
+               
+         }//if
+             
+         else if ( current->data.Name <= list[i].Name   ){
+           if(current->right == NULL){
+             current->right = new TreeNode();
+             current->right->data = list[i];
+             current = current->right ;
+             
+             break;
+           } // if
+           else
+             current = current->right;
+             
+         } // else if
+         
+       }//while
+         
+     } //else
+         
+     i++;
+   }  //while
+   current = root1 ;
+   if( getheight( current ) == 0 ) cout << "There is no data!"  << endl ;
+   else cout << "Tree height {School name} =" << getheight( current ) << endl ;
+   
+ } // NameInsertBST
+
+ int num ;
+ void preOrderPrint( TreeNode * head ) {
+   if ( head != NULL ) {
+
+     cout << '[' << num + 1 << "]\t" << head->data.Name << '\t' << head->data.Department_name << '\t' ;
+     cout << head->data.Type << '\t' << head->data.Level << '\t' << head->data.num_students << '\t' ;
+     cout << head->data.num_professors << '\t' << head->data.num_graduates << '\t'  << endl ;
+     num ++ ;
+     
+     preOrderPrint( head->left ) ;
+     preOrderPrint( head->right ) ;
+   } // if()
+ } // inOrderPrint()
+ 
+ void NumInsertBST( vector<Data> list ){
+   root2 = NULL ;
+   int i = 0 ;
+   
+   while ( i < list.size() ) {
+     current = root2;
+     if (current == NULL) {
+       current = new TreeNode() ;
+       current->data = list[i];
+       root2 = current ;
+     } // if
+     
+     else {
+       while (true){
+         if ( current->data.num_graduates > list[i].num_graduates  ){
+           if(current->left == NULL){
+             current->left = new TreeNode();
+             current->left->data = list[i];
+             current = current->left ;
+             
+             break;
+           } // if
+           else
+             current = current->left;
+         }//if
+           
+         else if ( current->data.num_graduates <= list[i].num_graduates   ){
+           if(current->right == NULL){
+             current->right = new TreeNode();
+             current->right->data = list[i];
+             current = current->right ;
+             
+             break;
+           } // if
+               
+           else
+             current = current->right;
+         } // else if
+           
+       } //while
+         
+     } //else
+     i++;
+   }  //while
+   
+   current = root2 ;
+   if(getheight(  current )!=0) cout << "Tree height {Number of graduates} =" << getheight( current ) << endl ;
+   
+ } // NumInsertBST
+ 
+ void Search_by_Graduates( TreeNode * cur, vector<Data> &new_list, int standard ){
+   if( cur != NULL ) {
+     if ( cur->data.num_graduates >= standard  ){
+       new_list.push_back(cur->data) ;
+       //if( cur->left != NULL )
+       Search_by_Graduates( cur->left, new_list, standard );
+       Search_by_Graduates( cur->right, new_list, standard );
+     }//if
+     else if ( cur->data.num_graduates < standard   )
+       Search_by_Graduates( cur->right, new_list,standard );
+           
+     //else if( cur->right == NULL && cur->left == NULL )  return ;
+   }  // if
+    
+ } // Search_by_Graduates
+ 
+ void Search_by_School( TreeNode * cur, vector<Data> &name_List, string standard ){
+   if( cur != NULL ) {
+     if ( cur->data.Name == standard  ){ // same name
+       exist = true;
+       name_List.push_back(cur->data) ;
+       //if( cur->left != NULL )
+       Search_by_School( cur->left, name_List, standard );
+       Search_by_School( cur->right, name_List, standard );
+     }//if
+     else if ( cur->data.Name < standard   )
+       Search_by_School( cur->right, name_List,standard );
+     else if ( cur ->data.Name > standard )
+       Search_by_School( cur->left, name_List,standard );
+           
+     //else if( cur->right == NULL && cur->left == NULL )  return ;
+         
+   }  // if
+   
+ } //Search_by_School
+ 
+ 
+ void Delete_Graduatestree( TreeNode * &cur, int standard, vector<Data> &Delete_List ) {
+   if( cur != NULL ) {
+     if ( cur->data.num_graduates <= standard  ){
+       exist = true;
+       Delete_List.push_back(cur->data) ;
+       if( cur->left == NULL && cur->right == NULL  ){
+         delete cur;
+         cur = NULL;
+         return ;
+       } // if
+         
+       else if ( cur->left == NULL && cur->right != NULL ){
+         TreeNode *temp = cur ;
+         cur = cur->right ;
+         delete temp ;
+         temp = NULL ;
+         Delete_Graduatestree( cur, standard, Delete_List );
+       } // else if
+        
+       
+       else if ( cur->right == NULL && cur->left != NULL ){
+         TreeNode *temp = cur ;
+         cur = cur->left ;
+         delete temp ;
+         temp = NULL ;
+          
+         Delete_Graduatestree( cur, standard, Delete_List );
+       } // else if
+       
+       else if ( cur->left != NULL && cur->right != NULL ) {
+         TreeNode *temp = cur->right;
+         TreeNode * pret = cur ;
+         while( temp->left != NULL ) {
+           pret = temp ;
+           temp = temp->left;
+         } // while ()
+         if ( temp == cur->right ) {
+           cur->data = temp->data ;
+           cur->right = temp->right ;
+           delete temp ;
+           temp = NULL ;
+         } // if()
+
+         else {
+           cur->data = temp->data ;
+           pret->left = temp->right ;
+           delete temp ;
+           temp = NULL ;
+         } // else
+         
+         Delete_Graduatestree( cur, standard, Delete_List );
+       } // else if
+            
+     }//if
+     
+     else if ( cur->data.num_graduates > standard )
+       Delete_Graduatestree( cur->left, standard, Delete_List );
+     
+   }  // if
+   
+ } //Delete_Schooltree
+ 
+ 
+ void Delete_Nametree( TreeNode * &cur, Data Delete_List ) {
+   if( cur != NULL ) {
+     exist = false ;
+     if ( cur->data.Name == Delete_List.Name && cur->data.num_graduates == Delete_List.num_graduates ){
+       exist = true;
+       if( cur->left == NULL && cur->right == NULL  ){
+         delete cur;
+         cur = NULL;
+         return ;
+       } // if
+         
+       else if ( cur->left == NULL && cur->right != NULL ){
+         TreeNode *temp = cur ;
+         cur = cur->right ;
+         delete temp ;
+         temp = NULL ;
+         Delete_Nametree( cur, Delete_List );
+       } // else if
+        
+       
+       else if ( cur->right == NULL && cur->left != NULL ){
+         TreeNode *temp = cur ;
+         cur = cur->left ;
+         delete temp ;
+         temp = NULL ;
+          
+         Delete_Nametree( cur, Delete_List );
+       } // else if
+       
+       else if ( cur->left != NULL && cur->right != NULL ) {
+         TreeNode *temp = cur->right;
+         TreeNode * pret = cur ;
+         while( temp->left != NULL ) {
+           pret = temp ;
+           temp = temp->left;
+         } // while ()
+         if ( temp == cur->right ) {
+           cur->data = temp->data ;
+           cur->right = temp->right ;
+           delete temp ;
+           temp = NULL ;
+         } // if()
+
+         else {
+           cur->data = temp->data ;
+           pret->left = temp->right ;
+           delete temp ;
+           temp = NULL ;
+         } // else
+         
+         Delete_Nametree( cur, Delete_List );
+       } // else if
+            
+     }//if
+     
+     else if (cur->data.Name == Delete_List.Name && cur->data.num_graduates != Delete_List.num_graduates )
+       Delete_Nametree( cur->right, Delete_List ) ;
+     
+     else if ( cur->data.Name > Delete_List.Name  )
+       Delete_Nametree( cur->left, Delete_List ) ;
+       
+     else if ( cur->data.Name < Delete_List.Name  )
+       Delete_Nametree( cur->right, Delete_List ) ;
+
+   }  // if
+     
+   
+ } //Delete_Nametree
+ 
+ 
+ int getheight( TreeNode * cur ) {
+   if ( !cur ) return 0 ;
+   else return  max( getheight( cur -> left), getheight( cur -> right) )+1  ;
+ } // getheight
+ 
+ void readfile( vector<Data> &list ) { // read data
+   list.clear() ;
+   string final_file_name;
+   fstream file ;
+   file_name = GetNum() ;  // Get File Name
+   final_file_name = "input" + file_name + ".txt" ;
+   file.open( final_file_name, ios::in ) ; // open file
+   
+   if ( !file.is_open() ) {
+     open = false ;
+     cout << endl <<"### " << final_file_name << " does not exist! ###" << endl ;
+   } // if
+   
+   else{
+     open = true ;
+     char cstr[255];
+     int fNo,pre,pos;
+ 
+     file.getline(cstr,255,'\n'); // skip the first line
+     file.getline(cstr,255,'\n'); // skip the second line
+     file.getline(cstr,255,'\n'); // skip the third line
+ 
+     while (file.getline(cstr,255,'\n')) { // get data
+       Data oneR;
+       string buf, cut;
+   
+       fNo = 0; // number of fields read so far (Âà∞ÁõÆÂâçÁÇ∫Ê≠¢ËÆÄÂèñÁöÑÂ≠óÊÆµÊï∏)
+       pre = 0; // locate one field of input record (ÂÆö‰ΩçËº∏ÂÖ•Ë®òÈåÑÁöÑ‰∏ÄÂÄãÂ≠óÊÆµ) Á¨¨ÂπæÂÄã‰ΩçÁΩÆ
+       buf.assign(cstr); // copy c-string into C++ string
+   
+       do{ // scan the buf from left to right
+         pos = buf.find_first_of('\t',pre) ; // Âæûpre‰ΩçÁΩÆÈñãÂßãÊâæ'\t',Â¶ÇÊûúÊâæÂà∞'\t'‰∏≠‰ªª‰∏ÄÂ≠óÂÖÉ Â∞±ËøîÂõû‰ªñÂú®buf‰∏≠ÁöÑÈô£ÂàóÂÄº
+         cut = buf.substr(pre,pos - pre); // Âæûbuf‰∏≠Á¨¨pre‰ΩçÈñãÂßãÁöÑÈï∑Â∫¶ÁÇ∫pos-preÁöÑÂ≠ó‰∏≤  //retrieve a field
+         switch(++fNo){  // fNoÁÇ∫Á¨¨ÂπæÁ≠ÜË≥áÊñô
+           case 2: oneR.Name = cut;  // get school name
+             break;
+           case 4: oneR.Department_name = cut; // get the Department_name
+             break;
+           case 5: oneR.Type = cut; // get either day or night
+             break;
+           case 6: oneR.Level = cut; // get level
+             break;
+           case 7: oneR.num_students = atoi(cut.c_str()); // get num_students
+             break;
+           case 8: oneR.num_professors = atoi(cut.c_str());
+             break;
+           case 9: oneR.num_graduates = atoi(cut.c_str());
+             break;
+           default: break;
+   
+         } // switch
+   
+         pre = ++pos; // remove to the next field
+       } while((pos>0) && (fNo<10));
+ 
+        list.push_back(oneR); // save one record into theschool list
+     } // while
+   } // else
+     
+   file.close() ;
+ } // read
+ 
+}; // BST
+
+
+BST bst;
+int main() {
+ while( true ){
+   cout << endl ;
+   cout << "*** University Graduate Information System ***" << endl ;
+   cout << "* 0. Quit                                    *" << endl ;
+   cout << "* 1. Create Two Binary Search Trees          *" << endl ;
+   cout << "* 2. Search by Number of Graduates           *" << endl ;
+	 cout << "* 3. Search by School Name                   *" << endl ;
+	 cout << "* 4. Removal by Number of Graduates          *" << endl ;
+	 cout << "**********************************************" << endl ;
+   cout << "Input a command(0,1-4):"  ;
+ 
+   int  cmd;
+   cin >> cmd ;
+
+   vector<Data> new_list;
+   vector<Data> name_List ;
+   vector<Data> delete_List ;
+   
+   if ( cmd == 2 ) {
+     if(use_cmd1_first==false) cout << "Please choose command 1 first!" << endl ;
+     else{
+       cout << endl <<"Input the number of graduates: " ;
+       string Standard;
+       cin >> Standard ;
+       if ( !is_Num(Standard) ) {
+         cout << endl <<"### the input string" << Standard << " is not a decimal number! ###" << endl << "There is no match!" << endl ;
+         continue;
+       } // if
+ 
+       int standard = stoi(Standard) ;
+       bst.current = bst.root2;
+       bst.Search_by_Graduates(  bst.current, new_list, standard );
+       print( new_list );
+     } // else
+     
+   } //  if
+   
+   else if (cmd == 0 ) break ;
+     
+   else
+     cout << "Command does not exist!" << endl ;
+   
+ } // while(true)
+   
+} // main
+
+void print( vector<Data> new_list ) {
+ for( int i = 0 ; i < new_list.size(); ++i ) cout << '['<< i+1 << ']' << '\t'<< new_list[i].Name  << '\t' << new_list[i].Department_name  << '\t' << new_list[i].Type << '\t' << new_list[i].Level << '\t' << new_list[i].num_students << '\t' << new_list[i].num_professors << '\t'<< new_list[i].num_graduates << '\n';
+ cout << endl ;
+} // print
+
+bool is_Num( string str ) { // check the string input is an integer or not
+ for( int i = 0 ; i < str.size() ; i++ ) { // input.size can return the length of the string input
+   if( str[i] >= '0' && str[i] <= '9' ) // Use ASCII to know whether the input[i] is an integer
+     continue ;
+   else
+     return false ; // String input have an element that is not integer
+ } // for
+ return true ; // In string input all of the elements are an integer
+} // is_Num
+
+string GetNum( ) { // Get a number from user and make sure the number no more than
+ string input ;
+ while(true) {
+   cout << "Input a file number :" ;
+   cin >> input ;
+   return input ;
+ } // while
+} // GetNum
