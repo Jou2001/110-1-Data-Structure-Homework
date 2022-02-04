@@ -351,7 +351,7 @@ string GetNum( ) { // Get a number from user and make sure the number no more th
    cout << "Input a file number (e.g. 401, 402, .....):" ;
    cin >> input ;
    if ( !is_Num( input ) ) // Input is not integer
-     cout << "Not an integer Please try again! " << endl ;
+     cout << "Not an integer Please try again! " << endl 
    else // Input is an integer
      return input ;
   } // while
