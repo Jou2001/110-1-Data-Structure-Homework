@@ -472,4 +472,4 @@ string GetNum( ) { // Get a number from user and make sure the number no more th
    else // Input is an integer
      return input ;
   } // while
-} // GetNum
+} // GetNum 
