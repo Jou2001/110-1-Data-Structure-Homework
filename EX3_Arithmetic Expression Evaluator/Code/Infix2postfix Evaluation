@@ -157,8 +157,8 @@ int main () {
     cin >> cmd ; // read the cohice
          
     while( cmd != 1 && cmd != 0 ) { // str is not an integer keep input until the command is integer
-        cout << "Input a choice(0,1):"  ;
-        cin >> cmd ;
+			cout << "Input a choice(0,1):"  ;
+      cin >> cmd ;
     } // while
     
     if ( cmd == 0 )
@@ -169,10 +169,10 @@ int main () {
       getline(cin, n) ;    // cin '\n'
       getline(cin, list) ; // cin infix expression
          
-   for ( int i =  0 ; i < list.size() ; i++ )
-       if( list[i] !=  ' ' ) tempC.push_back( list[i] ) ; // ignore space and add list[i] to  vector tempC's back
+   		for ( int i =  0 ; i < list.size() ; i++ )
+      	if( list[i] !=  ' ' ) tempC.push_back( list[i] ) ; // ignore space and add list[i] to  vector tempC's back
          
-       if ( tempC.empty() ) { // ≠Y•uøÈ§Jenter
+      if ( tempC.empty() ) { 
         cout << "Error 3: there is one extra operator." << endl ;
         continue ;
       } //if
@@ -182,17 +182,11 @@ int main () {
       if ( legal ) {  // It's a legitimate infix expression
         cout << "It is a legitimate infix expression. " << endl ;
         char_to_vector( tempC, new_list ) ;
-      
         stack mystack;
         LinkedList mylist;
-    
         infix_to_postfix( new_list, mystack, mylist ) ;
-        
         mylist.Arithmetic( mystack ) ;
-        
-        
         mylist.Clear();
-
       } // if
     } // else if
     
@@ -249,9 +243,8 @@ void LinkedList :: Arithmetic( stack &mystack ) {
   while ( work != 0 ) {
     if ( is_Num( work->str[0] ) ) {
       mystack.push( work->str ) ;
-    }
+    } // if
     else {
-    
       int num = stoi(mystack.GetTop() ) ;
       mystack.pop();
       int num1 = stoi(mystack.GetTop() ) ;
@@ -266,22 +259,21 @@ void LinkedList :: Arithmetic( stack &mystack ) {
       else if ( work->str == "/" ) {
         if ( num == 0 ) {
           cout << "### Error: Divided by ZERO! ### " << endl  ;
-                    cout << "### It cannot be successfully evaluated! ###" << endl ;
+          cout << "### It cannot be successfully evaluated! ###" << endl ;
           return;
-        }
+        } // if
         else mystack.push( to_string( num1 / num ) ) ;
     
-      }
+      } // else if
     } //else
     
     work = work->next;
       
-  }
+  } // while
   
   cout << "Ans: " << mystack.GetTop() << endl;
 
-  
-}
+} // Arithmetic
 
 void char_to_vector( vector <char> &tempC, vector <string> &new_list ) {
   for ( int i = 0 ; i < tempC.size() ; i++ ) {
@@ -319,11 +311,10 @@ void legal_infix1 ( vector <char> &tempC ) { // check whether exist an illegal c
   
   for ( int i = 0 ; i < tempC.size() ; i++ ) {
     if (  is_Num( tempC[i] )  ) ;
-
-     else if ( ( tempC[i] != '+' && tempC[i] != '-' && tempC[i] != '*' && tempC[i] != '/' && tempC[i] != '(' && tempC[i] != ')' ) && tempC[i] != '\n' ) {
-    legal = false ;
-       cout << "Error 1:" << tempC[i] << " is not a legitimate character." << endl ;
-       return ;
+		else if ( ( tempC[i] != '+' && tempC[i] != '-' && tempC[i] != '*' && tempC[i] != '/' && tempC[i] != '(' && tempC[i] != ')' ) && tempC[i] != '\n' ) {
+    	legal = false ;
+			cout << "Error 1:" << tempC[i] << " is not a legitimate character." << endl ;
+      return ;
     } // else if
   
   } // for
@@ -334,7 +325,6 @@ void legal_infix2 ( vector <char> &tempC ) {
   int parentheses = 0 ; // calculate the number of parentheses
   
   for ( int i = 0 ; i < tempC.size() ; i++ ) {
-    
     if ( tempC[i] == '(' )   parentheses++ ;
     else if ( tempC[i] == ')' )   parentheses-- ;
   } //for
@@ -399,6 +389,3 @@ bool is_Num( char c ) { // check the string input is an integer or not
    return ( c >= 48 && c <= 57 ); // In string input all of the elements are an integer
   
 } // is_Num
-
-
-
