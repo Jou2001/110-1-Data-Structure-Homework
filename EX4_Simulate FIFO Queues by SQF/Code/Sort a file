@@ -1,1 +1,192 @@
+// 10927202 陽彩柔  10927212 趙珀
+#include<iostream>
+#include<fstream>  // ifstream
+#include<vector>
+#include<time.h>   // clock
+#include<conio.h>  // getch
+#include<iomanip>  // setprecision
+
+using namespace std ;
+
+struct job ;
+struct Abort ;
+struct Done ;
+class Queue ;
+ 
+bool open = true ; // check the file exist
+double readFinish, sortFinish, writeFinish ;
+string file_name ;
+
+bool alreadysorted = false ;
+string GetNum( ) ;          // get the file number
+bool is_Num( string str ) ; // check the string
+
+void read(vector<job> &list ) ;        // read data
+void shellshort( vector<job> &list ) ; // sort data
+void printVector( vector<job> list) ;  // print data
+void file_out( vector<job> &list ) ;   // write sort data
+void printTime( double readFinish, double sortFinish, double writeFinish ) ; // print time
+
+struct job {
+ int OID ;
+ int Arrival ;
+ int Duration ;
+ int TimeOut ;
+}; // job
+
+int main() {
+ while( true ){
+   cout << endl ;
+   cout << "** Simulate FIFO Queues by SQF   **" << endl ;
+   cout << "*  0. Quit                        *" << endl ;
+   cout << "*  1. Sort a file                 *" << endl ;
+   cout << "*  2. Simulate one FIFO queue     *" << endl ;
+   cout << "*  3. Simulate two queues by SQF  *" << endl ;
+   cout << "***********************************" << endl ;
+   cout << "Input a command(0,1,2,3):"  ;
+   
+   string str ;
+   cin >> str ;
+   
+   while( !is_Num(str) ) { // str is not an integer keep input until the command is integer
+     cout << "Command does not exist!" << endl ;
+     cout << "Input a command(0,1,2,3):" ;
+     cin >> str ;
+   } // while
+   
+   int cmd = stoi(str) ; // let str convert to integer
+   
+   if ( cmd == 0 )
+     break ;
+             
+   else if ( cmd == 1) {
+     vector<job> list ;
+     read(list) ;
+     if (open) {           // file exist
+       printVector(list) ; // print file content
+       shellshort(list) ;  // use shell short to sort the file data
+       file_out(list) ;    // write sort data
+       cout << endl << "Ω–´ˆ•Ù∑N¡‰ƒ~ƒÚ..." << endl ;
+       int ch = getch() ;
+       printTime( readFinish, sortFinish, writeFinish ) ;
+       cout << endl << "See sorted" << file_name << ".txt" << endl ;
+     } // if
+   } // else if
+   
+   
+   else cout << "Command does not exist!" << endl ; // cmd is not 1 or 2
+ } // while
+} // main
+
+
+void read( vector<job> &list ) { // read data
+ job temp ;
+ string OiD, arrival, duration, timeout, final_file_name ;
+ alreadysorted = true;
+ ifstream file ;
+ file_name = GetNum() ;  // Get File Name
+ final_file_name = "input" + file_name + ".txt" ;
+ file.open( final_file_name, ios::in ) ; // open file
+ 
+
+ if ( !file.is_open() ) {
+   open = false ;
+   cout << endl << final_file_name << " does not exist!" << endl ;
+ } // if
+ 
+ else{
+   double start = clock() ; // start to calculate the time it takes to read files
+   open = true ;
+   file >> OiD >> arrival >> duration >> timeout ;
+   while( !file.eof() ) {
+     file >> temp.OID  ;
+     file >> temp.Arrival ;
+     file >> temp.Duration ;
+     file >> temp.TimeOut ;
+     if ( !file.fail())
+       list.push_back(temp) ;
+   } // while
+   readFinish = clock() ; // end to calculate the time it takes to read files
+   readFinish -= start ;
+ } // else
+ file.close() ;
+} // read
+
+void printVector( vector<job> list) { // print data
+ cout << endl << '\t' << "OID" << '\t' << "Arrival" << '\t' << "Duration" << '\t' << "TimeOut" << endl ;
+ for( int i = 0 ; i < list.size(); ++i )
+   cout << "(" << i+1 << ")" << '\t' <<list[i].OID << '\t' << list[i].Arrival << '\t' << list[i].Duration << '\t' << list[i].TimeOut << endl ;
+ return ;
+} // printVector
+
+void shellshort( vector<job> &list ) { // sort data
+ int len = list.size();
+ double start = clock() ; // start to calculate the time it takes to sort data
+ for( int k=len/2 ; k>0 ; k/=2 ) {
+   for( int i=k ; i<len ; i++ ) {
+     for( int j=i-k ; j>=0 ; j-=k ) {
+       if(list[j].Arrival == list[j+k].Arrival) {
+         if(list[j].OID > list[j+k].OID)
+           swap(list[j+k],list[j]);
+       } // if
+       else if(list[j].Arrival > list[j+k].Arrival)
+         swap(list[j+k],list[j]);
+       else break;
+     } // for
+   } // for
+ } // for
+ sortFinish = clock() ; // end to calculate the time it takes to sort data
+ sortFinish -= start ;
+} // shellshort
+
+void file_out( vector<job> &list ) { // write data
+ fstream file ;
+ string final_file_name = "sorted" + file_name + ".txt" ;
+ file.open(final_file_name,ios::out ) ;
+ 
+ if(!file) cout << "can't open" ;
+ 
+ else {
+   double start = clock() ; // start to calculate the time it takes to write data
+   file << "OID" << '\t' << "Arrival" << '\t' << "Duration" << '\t' << "TimeOut" << endl ; // ±N∏ÍÆ∆øÈ•X¶‹¿…Æ◊
+   for( int i = 0 ; i < list.size(); ++i )
+     file << list[i].OID << '\t' << list[i].Arrival << '\t' << list[i].Duration << '\t' << list[i].TimeOut << endl ;
+   writeFinish = clock() ; // end to calculate the time it takes to write data
+   writeFinish -= start ;
+ } // else
+ 
+ file.close();
+} // file_out
+
+
+void printTime( double readFinish, double sortFinish, double writeFinish )  {
+ cout << endl ;
+ cout << "Reading data: " << readFinish << " ms" << endl ;
+ cout << "Sorting data: " << sortFinish << " ms" << endl ;
+ cout << "Writing data: " << writeFinish << " ms" << endl ;
+} // printTime
+
+bool is_Num( string str ) { // check the string input is an integer or not
+
+ for( int i = 0 ; i < str.size() ; i++ ) { // input.size can return the length of the string input
+   if( str[i] >= '0' && str[i] <= '9' ) // Use ASCII to know whether the input[i] is an integer
+     continue ;
+   else
+     return false ; // String input have an element that is not integer
+ } // for
+ return true ; // In string input all of the elements are an integer
+ 
+} // is_Num
+
+string GetNum( ) { // Get a number from user and make sure the number no more than
+string input ;
+while(true) {
+  cout << "Input a file number (e.g. 401, 402, .....):" ;
+  cin >> input ;
+  if ( !is_Num( input ) ) // Input is not integer
+    cout << "Not an integer Please try again! " << endl ;
+  else // Input is an integer
+    return input ;
+ } // while
+} // GetNum
 
