@@ -1,0 +1,404 @@
+// 10927202 陽彩柔  10927212 趙珀
+#include <iostream>
+#include <string>
+#include <vector>
+   
+using namespace std ;
+
+class LinkedList;
+                     
+class stack;
+bool legal = true ;
+bool is_Num( char c ) ;
+void check_error ( vector <char> &tempC ) ;
+void char_to_vector( vector <char> &tempC, vector <string> &new_list ) ;
+void print_vector( vector <string> new_list ) ;
+void legal_infix1 ( vector <char> &tempC ) ;
+void legal_infix2 ( vector <char> &tempC ) ;
+void legal_infix3 ( vector <char> &tempC) ;
+int priority(string op) ;
+void infix_to_postfix(  vector <string> &new_list, stack &mystack, LinkedList &mylist ) ;
+
+
+                     
+class ListNode{
+private:
+  string str;
+  ListNode *next;
+public:
+  ListNode():str(0),next(0){};
+  ListNode(string a):str(a),next(0){};
+
+  friend class LinkedList;
+}; // ListNode
+
+class LinkedList{
+private:
+  ListNode *first;
+public:
+  LinkedList():first(0){};
+  void  Arithmetic( stack &mystack ) ;
+    
+  void PrintList() {
+      
+    if ( first == 0 )
+      return;
+      
+    ListNode *work = first;
+    while ( work -> next != 0 ) {
+      cout << work -> str << ", ";
+      work = work->next;
+    } // while
+      
+    cout << work -> str ;
+    cout << endl;
+     
+  }; //  PrintList
+           
+  void Push_back( string last ) {
+      
+    ListNode *newNode = new ListNode(last);
+
+    if (first == 0) {
+      first = newNode;
+      return;
+    } // if
+
+    ListNode *work = first;
+    while (work->next != 0)
+      work = work->next;
+    
+    work->next = newNode;
+    
+  }; // Push_back
+    
+  void Clear() {
+      
+    while ( first != 0 ) {
+      ListNode *work = first;
+      first = first->next;
+      delete work;
+      work = 0;
+    } // while
+    
+  }; // Clear
+   
+}; // LinkedList
+
+
+class stackNode{
+private:
+  string str;
+  stackNode *next;
+public:
+  stackNode():str(0),next(0){};
+  stackNode(string a):str(a),next(0){};
+
+  friend class stack;
+}; // stackNode
+
+class stack{
+private:
+  int size = 0;
+  stackNode *top;
+public:
+  stack():top(0){};
+    
+  string GetTop() {
+    return top -> str;
+  } // GetTop
+  
+  void pop() {
+    if ( !isEmpty() ) {
+      stackNode *temp;
+      temp = top;
+      top = top -> next;
+      delete temp;
+      temp = NULL;
+      --size;
+    } // if
+    
+  } // pop
+  
+  void push( string newtop ) {
+    stackNode *temp = new stackNode(newtop) ;
+    temp -> next = top ;
+    top = temp ;
+    size++;
+  } // push
+  
+  bool isEmpty() {
+    return size == 0 ;
+  } // isEmpty
+  
+  int GetSize() {
+    return size;
+  } // GetSize
+
+}; // stack
+
+
+int main () {
+  
+  while (true) {
+    
+    cout << endl ;
+    cout << "*  Arithmetic Expression Evaluator      *" << endl ;
+    cout << "*  0. Quit                              *" << endl ;
+    cout << "*  1. Infix2postfix Evaluation          *" << endl ;
+    cout << "*****************************************" << endl ;
+    cout << "Input a choice(0, 1):" ;
+      
+    vector <string> new_list ;
+    vector <char> tempC ;
+    int cmd ;
+    string list ;
+    string n ;
+    cin >> cmd ; // read the cohice
+         
+    while( cmd != 1 && cmd != 0 ) { // str is not an integer keep input until the command is integer
+        cout << "Input a choice(0,1):"  ;
+        cin >> cmd ;
+    } // while
+    
+    if ( cmd == 0 )
+      break ;
+              
+    else if ( cmd == 1) {
+      cout << endl << "Input an infix expression : " ;
+      getline(cin, n) ;    // cin '\n'
+      getline(cin, list) ; // cin infix expression
+         
+   for ( int i =  0 ; i < list.size() ; i++ )
+       if( list[i] !=  ' ' ) tempC.push_back( list[i] ) ; // ignore space and add list[i] to  vector tempC's back
+         
+       if ( tempC.empty() ) { // ≠Y•uøÈ§Jenter
+        cout << "Error 3: there is one extra operator." << endl ;
+        continue ;
+      } //if
+        
+      check_error ( tempC ) ;
+      
+      if ( legal ) {  // It's a legitimate infix expression
+        cout << "It is a legitimate infix expression. " << endl ;
+        char_to_vector( tempC, new_list ) ;
+      
+        stack mystack;
+        LinkedList mylist;
+    
+        infix_to_postfix( new_list, mystack, mylist ) ;
+        
+        mylist.Arithmetic( mystack ) ;
+        
+        
+        mylist.Clear();
+
+      } // if
+    } // else if
+    
+    else
+      cout << "Command does not exist! " << endl ;
+  } // while
+         
+} // main
+
+void infix_to_postfix(  vector <string> &new_list, stack &mystack, LinkedList &mylist ) {
+
+  for ( int i = 0 ; i < new_list.size() ; i++) {
+    if ( is_Num( new_list[i][0] ) ) {
+      mylist.Push_back( new_list[i] ) ;
+      continue;
+    } // if
+    
+    if ( new_list[i] == "(" ) {
+      mystack.push( new_list[i] )  ;
+      continue;
+    } // if
+    
+    if ( new_list[i] == ")" ) {
+      while ( mystack.GetTop() != "(") {
+        mylist.Push_back( mystack.GetTop() )  ;
+        mystack.pop();
+      } // while
+      mystack.pop() ;
+      continue;
+    } // if
+    
+    while ( !mystack.isEmpty()  && priority( new_list[i] ) <= priority( mystack.GetTop() ) ) {
+      mylist.Push_back( mystack.GetTop() )  ;
+      mystack.pop();
+    } // while
+  
+    mystack.push( new_list[i] ) ;
+
+  } //for
+  
+  while ( !mystack.isEmpty() ) {
+    mylist.Push_back( mystack.GetTop() )  ;
+    mystack.pop();
+  } // while
+  
+  mylist.PrintList() ;
+  
+      
+} // infix_to_postfix
+
+void LinkedList :: Arithmetic( stack &mystack ) {
+  
+  ListNode*work = first ;
+  while ( work != 0 ) {
+    if ( is_Num( work->str[0] ) ) {
+      mystack.push( work->str ) ;
+    }
+    else {
+    
+      int num = stoi(mystack.GetTop() ) ;
+      mystack.pop();
+      int num1 = stoi(mystack.GetTop() ) ;
+      mystack.pop();
+      
+      if ( work->str == "+" ) mystack.push( to_string( num1 + num ) ) ;
+        
+      else if ( work->str == "-" ) mystack.push( to_string( num1 - num ) ) ;
+      
+      else if ( work->str == "*" ) mystack.push( to_string( num1 * num ) ) ;
+      
+      else if ( work->str == "/" ) {
+        if ( num == 0 ) {
+          cout << "### Error: Divided by ZERO! ### " << endl  ;
+                    cout << "### It cannot be successfully evaluated! ###" << endl ;
+          return;
+        }
+        else mystack.push( to_string( num1 / num ) ) ;
+    
+      }
+    } //else
+    
+    work = work->next;
+      
+  }
+  
+  cout << "Ans: " << mystack.GetTop() << endl;
+
+  
+}
+
+void char_to_vector( vector <char> &tempC, vector <string> &new_list ) {
+  for ( int i = 0 ; i < tempC.size() ; i++ ) {
+    string temp = "" ;
+    bool isnum = false ;
+    
+    while ( is_Num( tempC[i] )  ) {
+      temp += tempC[i] ;
+      i++ ;
+      isnum = true ;
+    } // while
+    
+    if ( isnum == true ) new_list.push_back(temp) ; //  add temp to  vector new_list's back
+    
+    temp = "" ;
+        
+    if ( tempC[i] ==  '+' || tempC[i] ==  '-' || tempC[i] ==  '*' || tempC[i] ==  '/' || tempC[i] ==  '(' || tempC[i] ==  ')' ) {
+      temp += tempC[i] ;
+      new_list.push_back(temp); //  add temp to  vector new_list's back
+    } // if
+     
+  } //for
+        
+} // char_to_vector
+
+void check_error ( vector <char> &tempC ) { // check whether infix expression is legal or know is Error 1\ Error 2\ Error3
+  legal = true ;
+  
+  if ( legal ) legal_infix1 ( tempC ) ;
+  if ( legal ) legal_infix2 ( tempC ) ;
+  if ( legal ) legal_infix3 ( tempC ) ;
+} // cheack_error
+
+void legal_infix1 ( vector <char> &tempC ) { // check whether exist an illegal character
+  
+  for ( int i = 0 ; i < tempC.size() ; i++ ) {
+    if (  is_Num( tempC[i] )  ) ;
+
+     else if ( ( tempC[i] != '+' && tempC[i] != '-' && tempC[i] != '*' && tempC[i] != '/' && tempC[i] != '(' && tempC[i] != ')' ) && tempC[i] != '\n' ) {
+    legal = false ;
+       cout << "Error 1:" << tempC[i] << " is not a legitimate character." << endl ;
+       return ;
+    } // else if
+  
+  } // for
+  
+} // legal_infix1
+
+void legal_infix2 ( vector <char> &tempC ) {
+  int parentheses = 0 ; // calculate the number of parentheses
+  
+  for ( int i = 0 ; i < tempC.size() ; i++ ) {
+    
+    if ( tempC[i] == '(' )   parentheses++ ;
+    else if ( tempC[i] == ')' )   parentheses-- ;
+  } //for
+    
+  if ( parentheses != 0 ) { // Has extra parentheses
+    legal = false ;
+      if ( parentheses > 0 )
+         cout << "Error 2 : There is one extra open parentheses " << endl ;
+      else
+        cout << "Error 2 : There is one extra close parentheses " << endl ;
+          
+      return ;
+      
+    } // if
+
+} // legal_infix2
+
+void legal_infix3 ( vector <char> &tempC ) {
+  
+  bool is_E3 = false;
+  for ( int i = 0 ; i < tempC.size() ; i++ ) {
+    if ( tempC[i] == '+' || tempC[i] == '-'|| tempC[i] == '*' || tempC[i] == '/' || tempC[i] == '\n' || tempC[i] == '\0' ) {
+      if ( i-1 >= 0 && i+1 <= tempC.size()-1 ) {
+        
+        if (  !is_Num( tempC[i-1] )  || !is_Num( tempC[i+1] ) )
+          is_E3 = true ;
+      } // if
+      else  is_E3 = true ;
+      
+    } // if
+    
+    else if ( ( tempC[i] == '(' && tempC[i+1] == ')' ) || ( tempC[i] == '(' && ( tempC[i+1] == '+' || tempC[i+1] == '-' || tempC[i+1] == '*'|| tempC[i+1] == '/'  ))) {
+      legal = false ;
+      cout << "Error 3: it is not infix in the parentheses." << endl ;
+      return ;
+    } // else if
+    
+    else if( ( is_Num( tempC[i] )  && tempC[i-1] == ')' ) || ( is_Num( tempC[i] )  && tempC[i+1] == '(' ) )  {
+      legal = false ;
+      cout << "Error 3: there is one extra operand." << endl ;
+      return ;
+    } // else if
+    
+  } // for
+  
+  if ( is_E3 == true ) {
+    legal = false ;
+    cout << "Error 3: there is one extra operator." << endl ;
+  } // if
+  
+} // legal_infix3
+
+int priority(string op) {
+    if ( op ==  "+" || op == "-" ) return 1;
+    else if ( op ==  "*" || op == "/" ) return 2;
+    else return 0;
+
+} // priority
+
+bool is_Num( char c ) { // check the string input is an integer or not
+ 
+   return ( c >= 48 && c <= 57 ); // In string input all of the elements are an integer
+  
+} // is_Num
+
+
+
