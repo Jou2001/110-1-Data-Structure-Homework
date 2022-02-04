@@ -55,27 +55,6 @@ int main() {
       loopFindFibonacci( input ) ;
     } // else if
                   
-    else if ( cmd == 2 ) { // cmd == 2 use recursion to find fibonacci
-      input = GetNum() ;
-      for( int i = 1 ; i <= input ; i++ ) {
-        inner_times = 0, divisor = 1 ;
-        num[i] = recursionFindFi( i ) ;
-        reHowManyDivisor ( num[i], divisor, i ) ;
-      } // for
-      printf( "< Outer Recursion  %3d times >\n\n", outer_times ) ;
-    } // else if
-    
-    
-    else if ( cmd == 3 ) {
-      input = GetNum() ;
-      int several = HowMany(input, 10) ;
-      start = clock() ;
-      size = 0 , k = 1;
-      find_Per( input, several );
-      e_nd = clock() ;
-      printf( "%f ms\n", (e_nd - start)  ) ;
-      
-    } // else if
         
     else
       cout << endl << endl << "Command Does Not Exist. Try Again! " ;
@@ -84,7 +63,40 @@ int main() {
 
   } // main
 
-bool is_Num( string input ) { // check the string input is an integer or not
+// findFibonacci
+
+void loopFindFibonacci( int input ) {   
+  num[0] = 1, outer_times = 0 ;
+  for( int i = 1, serial = 1 ; i <= input ; i++, serial++ ) { // calculate Fibonacci
+		if ( i == 1 )
+    	num[i] = 1 ;
+    
+    else
+      num[i] = num[i-1] + num[i-2] ;
+    
+    HowManyDivisor( num[i], serial ) ;
+    outer_times++ ;
+	} // for
+  
+  printf( "< Outer loop :    %3dtimes >\n\n", outer_times ) ;
+} // FindFibonacci
+
+// find how many divisors
+
+void HowManyDivisor ( llu num, int serial ) { 
+  divisor = 1, inner_times = 0, tmp = 0 
+  for( divisor = 1 ; ( divisor * divisor ) <= num ; divisor++, inner_times++ ) { // use divisors are pair
+		if ( num % divisor == 0 )
+      tmp = divisor ;
+  } // for
+  
+  printf( "[%3d] %llu = %llu * %llu     ( Inner Loop:  %3d times )  \n", serial, num, tmp, num/tmp, inner_times  ) ;
+    
+} // HowManyDivisor
+
+// check the string input is an integer or not
+
+bool is_Num( string input ) { 
   
   for( int i = 0 ; i < input.size() ; i++ ) { // input.size can return the length of the string input
     if( input[i] >= '0' && input[i] <= '9' ) // Use ASCII to know whether the input[i] is an integer
@@ -127,130 +139,5 @@ int GetNum() { // Get a number from user and make sure the number no more than 9
     } // else
   } // while
 } // GetNum
-
-
-void loopFindFibonacci( int input ) { // findFibonacci
-  
-  num[0] = 1, outer_times = 0 ;
-  
-  for( int i = 1, serial = 1 ; i <= input ; i++, serial++ ) { // calculate Fibonacci
-    
-    if ( i == 1 )
-      num[i] = 1 ;
-    
-    else
-      num[i] = num[i-1] + num[i-2] ;
-    
-    HowManyDivisor( num[i], serial ) ;
-    outer_times++ ;
-    
-  } // for
-  
-  printf( "< Outer loop :    %3dtimes >\n\n", outer_times ) ;
-  
-} // FindFibonacci
-
-void HowManyDivisor ( llu num, int serial ) { // find how many divisors
-  
-  divisor = 1, inner_times = 0, tmp = 0 ;
-  
-  for( divisor = 1 ; ( divisor * divisor ) <= num ; divisor++, inner_times++ ) { // use divisors are pair
-    if ( num % divisor == 0 )
-      tmp = divisor ;
-  } // for
-  
-  printf( "[%3d] %llu = %llu * %llu     ( Inner Loop:  %3d times )  \n", serial, num, tmp, num/tmp, inner_times  ) ;
-    
-} // HowManyDivisor
-
-llu recursionFindFi( int input ) {
-  //outer_times++ ;
-  if ( num[input] ) // If num[input] has already been calculated, return it directly without continuing to calculate
-    return num[input] ;
-  
-  outer_times++ ;
-  
-  if( input == 1 || input == 0 )
-    return  1 ;
-  
-  else
-    return recursionFindFi( input-1 ) + recursionFindFi( input-2 ) ;
-  
-} // recursionFi
-
-llu reHowManyDivisor ( llu num, int divisor, int i ) { // use recuursion to find divisor
-  
-  inner_times++ ;
-  
-  if( ( divisor * divisor ) > num )
-    return -1 ;
-  
-  tmp = reHowManyDivisor( num, ++divisor, i ) ;
-  
-  if( tmp == -1 && num % (divisor-1) == 0 ) {
-   printf( "[%3d] %3llu = %3llu * %3llu     ( Inner Recursuion:  %3d times )  \n", i, num, (divisor-1), num/(divisor-1), inner_times  ) ;
-    return divisor ;
-  } // if
-  
-  return tmp ;
-
-} // reHowManyDivisor
-  
-llu HowMany( int input, int number ) { // calculate how many possible several
-  if( input > 0 )
-    return (number) * HowMany( --input, number-1 ) ;
-  else
-    return 1 ;
-} // HowMany
-
-
-void find_Per( int input, int several ) {
-  int i,j;
-  bool repeat = false ;
-  
-  if( size == input ) {
-    for( int b = 0 ; b < input && repeat == false ; b++ ) { // check repeat
-      for( int a = b+1 ; a < input  ; a++ ) {
-        if( result[b] == result[a] )
-          repeat = true ;
-      } // for
-    } // for
-    
-    
-    if ( repeat == false ) {
-      if ( k <= several ) {
-        printf( "[%3d] ", k) ;
-        k++ ;
-      } // if
-      
-      for(i=0; i< input ; i++ ) //i<input &&
-        printf( "%d ", result[i] ) ;
-  
-      printf( "\n" ) ;
-    } // if
-    
-    size--;
-  } // if
-  
-  else {
-    for( i=0 ; i< 10 ; i++ ) {
-      for( j=1 ; j<=size ; j++ ){
-        if( result[j] == i )
-          break;
-      } // for
-          
-      if( j>size ) {
-        result[size] = i;
-        size++;
-        find_Per(input, several );
-      } // if
-    } //for
-    size--;
-  } // else
-  
-} // find_Per
-
-
-
 
 
