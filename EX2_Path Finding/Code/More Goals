@@ -1,4 +1,4 @@
-// ¶§±m¬X 10927202   »¯¬Ä 10927212 
+// 陽彩柔 10927202   趙珀 10927212
 
 #include<iostream>  // cin cout
 #include<fstream>   // ifstream
@@ -12,9 +12,9 @@ class matrix {
  public:
   char **map = NULL ; // record maze map
   int correct_road[100][100] = { {0}, {0} } ; // record correct road to find G
-  int row = 0, col = 0 ; // row ¾î col ª½ 
-	int beststep ; // 
-	char **shortest_step = NULL ; // record the route if find out G
+  int row = 0, col = 0 ; // row æÓ col ™Ω
+  int beststep ; //
+  char **shortest_step = NULL ; // record the route if find out G
 }; // matrix
 
 
@@ -35,7 +35,7 @@ void record_walking2 ( matrix & maze, int i, int j, int num_G ) ;
 
 int main() {
  while( true ) {
- 	matrix maze ;
+   matrix maze ;
     cout << endl ;
     cout << "** Path Finding     **" << endl ;
     cout << "*  0. Quit           *" << endl ;
@@ -90,9 +90,6 @@ void cmd_read ( string file_name, int cmd ) {
     int num_G ;   // Number of G (goals)
     fact_G = 0 ;  // Actually find how many G
     string str ;
-    
-    if( cmd == 1 || cmd == 3)
-      num_G = 1 ;
       
     else if ( cmd == 2 ) { // cmd == 2
       cout << "Number of G (goals): " ;
@@ -101,7 +98,7 @@ void cmd_read ( string file_name, int cmd ) {
       while( !is_Num(str) ) { // str is not an integer keep input until the command is integer
         cout << "Input Number: "  ;
         cin >> str ;
-        } // while
+			} // while
         
       num_G = stoi(str) ; // let str convert to integer and assign to num_G
     }  // else if
@@ -110,100 +107,57 @@ void cmd_read ( string file_name, int cmd ) {
     file >> maze.col >> maze.row ;  // read file content
     
     maze.map = (char**)malloc(maze.row*sizeof(char*)) ;     //Create a 2D dynamic array
-    for(int i = 0 ; i < maze.row ; i++ ) 
-    	maze.map[i] = (char*)malloc(maze.col*sizeof(char)) ;
-    	
-    
+    for(int i = 0 ; i < maze.row ; i++ )
+      maze.map[i] = (char*)malloc(maze.col*sizeof(char)) ;
+      
     for(int row=0;row<maze.row;++row)      // Read the data into the array
       for(int col=0;col<maze.col;++col)
         file >> maze.map[row][col] ;
-		
+    
     int i = 0, j = 0 ;
-    if ( cmd == 3 ) {
-    	step = 0 ;
-    	maze.beststep = maze.col * maze.row ;
-    //	move( maze,i,j) ;
-    	record_walking2 ( maze, i, j, num_G ) ;
-     
-    	int row, col ;
-    	cout << endl ;
-    	for ( row = 0; row < maze.row ; row++ ) { // print the map
-        for (  col = 0; col < maze.col ; col++ ) 
-          cout << maze.map[row][col] ; 
+    if ( cmd == 1 || cmd == 2 ) { 
+      record_walking ( maze, i, j, num_G ) ;
+    
+      if ( fact_G != num_G && !find_G ) { // can not find G and can not find the number of num_G
         cout << endl ;
-      } // for
-      
-      cout << endl ;
-      if ( find_G ) {
-      	step = 1 ;
-      	maze.beststep = maze.col * maze.row ;
-      	find_shortest_path( maze, i, j ) ;
-      	
-      	for ( row = 0; row < maze.row ; row++ ) {
-        	for (  col = 0; col < maze.col ; col++ ) {
-          	if ( maze.shortest_step[row][col] == 'V')
-            	maze.shortest_step[row][col] = 'E' ;
-          	cout << maze.shortest_step[row][col] ;
-        	} // for
-         
-        	cout << endl ;
-      	} // for
-      	
-      	cout << endl ;
-      	
-      	cout << "Shortest path length = " << maze.beststep << endl ;
-			} // if
-			
-			else
-				cout << "### There is no path to find a goal! ###" << endl ;
-      
-		} // if
-    
-    else { // cmd == 1 || cmd == 2
-    	record_walking ( maze, i, j, num_G ) ;
-    
-    	if ( fact_G != num_G && !find_G ) { // can not find G and can not find the number of num_G
-      	cout << endl ;
-      	for ( int row = 0; row < maze.row ; row++ ) {
-        	for ( int col = 0; col < maze.col ; col++ ) {
-          	if ( maze.map[row][col] == 'X' )
-            	maze.map[row][col] = 'G' ;
-          	cout << maze.map[row][col] ;
-        	} // for
+        for ( int row = 0; row < maze.row ; row++ ) {
+          for ( int col = 0; col < maze.col ; col++ ) {
+            if ( maze.map[row][col] == 'X' )
+              maze.map[row][col] = 'G' ;
+            cout << maze.map[row][col] ;
+          } // for
           
-        	cout << endl ;
-      	} // for
-      	cout << endl ;
-    	} // if
+          cout << endl ;
+        } // for
+        cout << endl ;
+      } // if
   
-    	if( find_G ) { // find the number of num_G
-      	find_G = false ;
-      	fact_G = 0 ;
-      	path_to_success( maze, i, j, num_G ) ;
-    	} // if
-		} // else
-	} // else
-  
-  
+      if( find_G ) { // find the number of num_G
+        find_G = false ;
+        fact_G = 0 ;
+        path_to_success( maze, i, j, num_G ) ;
+      } // if
+    } // else
+  } // else
   
   file.close() ; // close file
 } // cmdread
 
 void delete_maze( matrix & maze ) {
-	
-	if ( maze.map != NULL ) {
-		for(int i=0;i<maze.row;++i)
-    	delete maze.map[i] ;
+  
+  if ( maze.map != NULL ) {
+    for(int i=0;i<maze.row;++i)
+      delete maze.map[i] ;
     delete maze.map ;
     maze.map = NULL ;
-	} // if
-	
+  } // if
+  
   if ( maze.shortest_step != NULL ) {
-  	for ( int i = 0 ; i< maze.row ; ++i)
-  		delete maze.shortest_step[i] ;
-  	delete maze.shortest_step ;
-  	maze.map = NULL ;
-	} // if
+    for ( int i = 0 ; i< maze.row ; ++i)
+      delete maze.shortest_step[i] ;
+    delete maze.shortest_step ;
+    maze.map = NULL ;
+  } // if
   
 } // delete
 
@@ -255,7 +209,7 @@ void path_to_success( matrix & maze, int i, int j, int num_G ) {
       } // for
     } //for
 
-    if ( fact_G == num_G ) {    // When the correct number of G is found, print the successful path 
+    if ( fact_G == num_G ) {    // When the correct number of G is found, print the successful path
       find_G = true;
       for (int row = 0; row < maze.row ; row++ ) {
         for ( int col = 0; col < maze.col ; col++ ) {
@@ -294,8 +248,8 @@ void record_walking2 ( matrix & maze, int i, int j, int num_G ) {
   if ( maze.map[i][j] == 'G' && fact_G != num_G ) {
     fact_G ++ ;
     find_G = true ;
-    if( step < maze.beststep ) 
-			maze.beststep = step ;
+    if( step < maze.beststep )
+      maze.beststep = step ;
   } // if
     
     if ( maze.map[i][j] == 'E') maze.map[i][j] = 'V'; // record route
@@ -310,53 +264,53 @@ void record_walking2 ( matrix & maze, int i, int j, int num_G ) {
 
 
 void move( matrix & maze, int i, int j ) {
-	if(maze.map[i][j] == 'G' ) {
-		find_G = true ;
-		if( step < maze.beststep ) 
-			maze.beststep = step ;
-			
-	} // if
-	
-	if ( i == maze.row || i < 0 || j == maze.col || j < 0 || maze.map[i][j] != 'E' || step == maze.beststep )
-		return ;
-		
-	maze.map[i][j] = 'V' ;
-	step ++ ;
-	if ( j+1 < maze.row ) move( maze, i, j+1 ) ;
-	if ( i+1 < maze.col ) move( maze, i+1, j) ;
-	if ( j - 1 >= 0 ) move( maze, i, j-1 ) ;
-	if ( i - 1 >= 0 ) move( maze, i-1, j) ;
-	step -- ;
+  if(maze.map[i][j] == 'G' ) {
+    find_G = true ;
+    if( step < maze.beststep )
+      maze.beststep = step ;
+      
+  } // if
+  
+  if ( i == maze.row || i < 0 || j == maze.col || j < 0 || maze.map[i][j] != 'E' || step == maze.beststep )
+    return ;
+    
+  maze.map[i][j] = 'V' ;
+  step ++ ;
+  if ( j+1 < maze.row ) move( maze, i, j+1 ) ;
+  if ( i+1 < maze.col ) move( maze, i+1, j) ;
+  if ( j - 1 >= 0 ) move( maze, i, j-1 ) ;
+  if ( i - 1 >= 0 ) move( maze, i-1, j) ;
+  step -- ;
 } // move
 
 void find_shortest_path( matrix & maze, int i, int j ) {
-	
-	if ( maze.map[i][j] == 'G') {
+  
+  if ( maze.map[i][j] == 'G') {
 
-		if ( step < maze.beststep ) {
-			maze.beststep = step ;
-			maze.shortest_step = (char**)malloc(maze.row*sizeof(char*)) ;     //Create a 2D dynamic array
-		
-  	  for(int k = 0 ; k < maze.row ; k++ ) {
-    		maze.shortest_step[k] = (char*)malloc(maze.col*sizeof(char)) ; 
-    		strcpy( maze.shortest_step[k], maze.map[k] ) ;
-			} // for
-		
-		} //if
-	
-	} // if
+    if ( step < maze.beststep ) {
+      maze.beststep = step ;
+      maze.shortest_step = (char**)malloc(maze.row*sizeof(char*)) ;     //Create a 2D dynamic array
+    
+      for(int k = 0 ; k < maze.row ; k++ ) {
+        maze.shortest_step[k] = (char*)malloc(maze.col*sizeof(char)) ;
+        strcpy( maze.shortest_step[k], maze.map[k] ) ;
+      } // for
+    
+    } //if
+  
+  } // if
 
-	if ( i == maze.row || i < 0 || j == maze.col || j < 0 || maze.map[i][j] != 'V' || step == maze.beststep )
-		return ;
-		
-	maze.map[i][j] = 'R' ;
-	step++ ;
-	if ( j+1 < maze.row  ) find_shortest_path( maze, i, j+1 ) ; 
-	if ( i+1 < maze.col   ) find_shortest_path( maze, i+1, j ) ; 
-	if ( j - 1 >= 0  ) find_shortest_path( maze, i, j-1  ) ; 
-	if ( i - 1 >= 0   ) find_shortest_path( maze, i-1, j ) ; 
-	maze.map[i][j] = 'V';
-	step-- ;
+  if ( i == maze.row || i < 0 || j == maze.col || j < 0 || maze.map[i][j] != 'V' || step == maze.beststep )
+    return ;
+    
+  maze.map[i][j] = 'R' ;
+  step++ ;
+  if ( j+1 < maze.row  ) find_shortest_path( maze, i, j+1 ) ;
+  if ( i+1 < maze.col   ) find_shortest_path( maze, i+1, j ) ;
+  if ( j - 1 >= 0  ) find_shortest_path( maze, i, j-1  ) ;
+  if ( i - 1 >= 0   ) find_shortest_path( maze, i-1, j ) ;
+  maze.map[i][j] = 'V';
+  step-- ;
 
 } // find_shortest_path
 
@@ -388,6 +342,3 @@ string GetNum( ) { // Get a number from user and make sure the number no more th
     
   } // while
 } // GetNum
-
-
-
