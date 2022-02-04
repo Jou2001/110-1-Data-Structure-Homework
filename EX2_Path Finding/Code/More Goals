@@ -103,19 +103,20 @@ void cmd_read ( string file_name, int cmd ) {
       num_G = stoi(str) ; // let str convert to integer and assign to num_G
     }  // else if
     
-    
     file >> maze.col >> maze.row ;  // read file content
     
     maze.map = (char**)malloc(maze.row*sizeof(char*)) ;     //Create a 2D dynamic array
+
     for(int i = 0 ; i < maze.row ; i++ )
       maze.map[i] = (char*)malloc(maze.col*sizeof(char)) ;
       
-    for(int row=0;row<maze.row;++row)      // Read the data into the array
-      for(int col=0;col<maze.col;++col)
+    for( int row = 0 ; row < maze.row ; ++row )      // Read the data into the array
+      for( int col = 0 ; col < maze.col ; ++col )
         file >> maze.map[row][col] ;
-    
+  
     int i = 0, j = 0 ;
-    if ( cmd == 1 || cmd == 2 ) { 
+    
+    if( cmd == 1 || cmd == 2 ) { 
       record_walking ( maze, i, j, num_G ) ;
     
       if ( fact_G != num_G && !find_G ) { // can not find G and can not find the number of num_G
@@ -140,26 +141,25 @@ void cmd_read ( string file_name, int cmd ) {
     } // else
   } // else
   
+  delete_maze( maze ) ;
+  
   file.close() ; // close file
 } // cmdread
 
-void delete_maze( matrix & maze ) {
-  
+void delete_maze( matrix & maze ) {  
   if ( maze.map != NULL ) {
     for(int i=0;i<maze.row;++i)
       delete maze.map[i] ;
     delete maze.map ;
-    maze.map = NULL ;
   } // if
   
   if ( maze.shortest_step != NULL ) {
     for ( int i = 0 ; i< maze.row ; ++i)
       delete maze.shortest_step[i] ;
-    delete maze.shortest_step ;
-    maze.map = NULL ;
+    delete maze.shortest_step;  
   } // if
   
-} // delete
+} // delete_maze
 
 void record_walking ( matrix & maze, int i, int j, int num_G ) {
   
@@ -184,16 +184,13 @@ void record_walking ( matrix & maze, int i, int j, int num_G ) {
   
   } // if
     
-    if ( maze.map[i][j] == 'E') maze.map[i][j] = 'V'; // record route
-    
-    if ( j+1 < maze.col && ( maze.map[i][j + 1] == 'E' || maze.map[i][j + 1] == 'G' ) && find_G == false )  record_walking (maze, i, j + 1, num_G ) ; // right is E or G
-    if ( i+1 < maze.row && ( maze.map[i + 1][j] == 'E' || maze.map[i + 1][j] == 'G' ) && find_G == false )  record_walking (maze, i + 1, j, num_G ) ; // down is E or G
-    if ( j-1 >= 0 && ( maze.map[i][j - 1] == 'E' || maze.map[i][j - 1] == 'G' ) && find_G == false )  record_walking (maze, i, j - 1, num_G ) ; // left is E or G
-    if ( i-1 >= 0 && ( maze.map[i - 1][j] == 'E' || maze.map[i - 1][j] == 'G' ) && find_G == false )  record_walking (maze, i - 1, j, num_G ) ; // up is E or G
-    
+  if ( maze.map[i][j] == 'E') maze.map[i][j] = 'V'; // record route  
+  if ( j+1 < maze.col && ( maze.map[i][j + 1] == 'E' || maze.map[i][j + 1] == 'G' ) && find_G == false )  record_walking (maze, i, j + 1, num_G ) ; // right is E or G
+  if ( i+1 < maze.row && ( maze.map[i + 1][j] == 'E' || maze.map[i + 1][j] == 'G' ) && find_G == false )  record_walking (maze, i + 1, j, num_G ) ; // down is E or G
+  if ( j-1 >= 0 && ( maze.map[i][j - 1] == 'E' || maze.map[i][j - 1] == 'G' ) && find_G == false )  record_walking (maze, i, j - 1, num_G ) ; // left is E or G
+  if ( i-1 >= 0 && ( maze.map[i - 1][j] == 'E' || maze.map[i - 1][j] == 'G' ) && find_G == false )  record_walking (maze, i - 1, j, num_G ) ; // up is E or G
     
 } // record_walking
-
 
 void path_to_success( matrix & maze, int i, int j, int num_G ) {
   
@@ -205,7 +202,7 @@ void path_to_success( matrix & maze, int i, int j, int num_G ) {
         if ( maze.map[row][col] == 'R')
           maze.correct_road[row][col] = 1 ;
         if ( maze.map[row][col] == 'X')
-            maze.correct_road[row][col] = 2 ;
+          maze.correct_road[row][col] = 2 ;
       } // for
     } //for
 
@@ -218,7 +215,7 @@ void path_to_success( matrix & maze, int i, int j, int num_G ) {
           if ( maze.map[row][col] == 'X')
             maze.map[row][col] = 'G' ;
           if ( maze.correct_road[row][col] == 1 )
-             maze.map[row][col] = 'R' ;
+            maze.map[row][col] = 'R' ;
              
           cout << maze.map[row][col] ;
         } // for
@@ -231,7 +228,6 @@ void path_to_success( matrix & maze, int i, int j, int num_G ) {
   
   } // if
   
-
   if ( maze.map[i][j] == 'V' ) maze.map[i][j] = 'R' ;
   if ( j+1 < maze.col &&  ( maze.map[i][j + 1] == 'V' || maze.map[i][j + 1] == 'G' ) && find_G == false )  path_to_success (maze, i, j + 1, num_G ) ; // in range and right is V or is G
   if ( i+1 < maze.row && ( maze.map[i + 1][j] == 'V' || maze.map[i + 1][j] == 'G' ) && find_G == false )  path_to_success (maze, i + 1, j, num_G ) ;// in range and down is V or is G
@@ -242,77 +238,6 @@ void path_to_success( matrix & maze, int i, int j, int num_G ) {
   if ( ( maze.map[i][j] == 'X' ) && find_G == false ) maze.map[i][j] = 'G' ;
   
 } // path_to_success
-
-void record_walking2 ( matrix & maze, int i, int j, int num_G ) {
-  
-  if ( maze.map[i][j] == 'G' && fact_G != num_G ) {
-    fact_G ++ ;
-    find_G = true ;
-    if( step < maze.beststep )
-      maze.beststep = step ;
-  } // if
-    
-    if ( maze.map[i][j] == 'E') maze.map[i][j] = 'V'; // record route
-    step++ ;
-    if ( j+1 < maze.col && ( maze.map[i][j + 1] == 'E' || maze.map[i][j + 1] == 'G' ) )  record_walking2 (maze, i, j + 1, num_G ) ; // right is E or G
-    if ( i+1 < maze.row && ( maze.map[i + 1][j] == 'E' || maze.map[i + 1][j] == 'G' )  )  record_walking2 (maze, i + 1, j, num_G ) ; // down is E or G
-    if ( j-1 >= 0 && ( maze.map[i][j - 1] == 'E' || maze.map[i][j - 1] == 'G' )  )  record_walking2 (maze, i, j - 1, num_G ) ; // left is E or G
-    if ( i-1 >= 0 && ( maze.map[i - 1][j] == 'E' || maze.map[i - 1][j] == 'G' )  )  record_walking2 (maze, i - 1, j, num_G ) ; // up is E or G
-    step-- ;
-    
-} // record_walking2
-
-
-void move( matrix & maze, int i, int j ) {
-  if(maze.map[i][j] == 'G' ) {
-    find_G = true ;
-    if( step < maze.beststep )
-      maze.beststep = step ;
-      
-  } // if
-  
-  if ( i == maze.row || i < 0 || j == maze.col || j < 0 || maze.map[i][j] != 'E' || step == maze.beststep )
-    return ;
-    
-  maze.map[i][j] = 'V' ;
-  step ++ ;
-  if ( j+1 < maze.row ) move( maze, i, j+1 ) ;
-  if ( i+1 < maze.col ) move( maze, i+1, j) ;
-  if ( j - 1 >= 0 ) move( maze, i, j-1 ) ;
-  if ( i - 1 >= 0 ) move( maze, i-1, j) ;
-  step -- ;
-} // move
-
-void find_shortest_path( matrix & maze, int i, int j ) {
-  
-  if ( maze.map[i][j] == 'G') {
-
-    if ( step < maze.beststep ) {
-      maze.beststep = step ;
-      maze.shortest_step = (char**)malloc(maze.row*sizeof(char*)) ;     //Create a 2D dynamic array
-    
-      for(int k = 0 ; k < maze.row ; k++ ) {
-        maze.shortest_step[k] = (char*)malloc(maze.col*sizeof(char)) ;
-        strcpy( maze.shortest_step[k], maze.map[k] ) ;
-      } // for
-    
-    } //if
-  
-  } // if
-
-  if ( i == maze.row || i < 0 || j == maze.col || j < 0 || maze.map[i][j] != 'V' || step == maze.beststep )
-    return ;
-    
-  maze.map[i][j] = 'R' ;
-  step++ ;
-  if ( j+1 < maze.row  ) find_shortest_path( maze, i, j+1 ) ;
-  if ( i+1 < maze.col   ) find_shortest_path( maze, i+1, j ) ;
-  if ( j - 1 >= 0  ) find_shortest_path( maze, i, j-1  ) ;
-  if ( i - 1 >= 0   ) find_shortest_path( maze, i-1, j ) ;
-  maze.map[i][j] = 'V';
-  step-- ;
-
-} // find_shortest_path
 
 bool is_Num( string str ) { // check the string input is an integer or not
  
