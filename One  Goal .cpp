@@ -1,4 +1,4 @@
-// ¶§±m¬X 10927202   »¯¬Ä 10927212 
+// Â¶Â§Â±mÂ¬X 10927202   Â»Â¯Â¬Ã„ 10927212 
 
 #include<iostream>  // cin cout
 #include<fstream>   // ifstream
@@ -12,7 +12,7 @@ class matrix {
  public:
   char **map = NULL ; // record maze map
   int correct_road[100][100] = { {0}, {0} } ; // record correct road to find G
-  int row = 0, col = 0 ; // row ¾î col ª½ 
+  int row = 0, col = 0 ; // row Â¾Ã® col ÂªÂ½ 
 	int beststep ; // 
 	char **shortest_step = NULL ; // record the route if find out G
 }; // matrix
