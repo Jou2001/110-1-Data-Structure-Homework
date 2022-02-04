@@ -365,14 +365,14 @@ class BST {
        Data oneR;
        string buf, cut;
    
-       fNo = 0; // number of fields read so far (Âà∞ÁõÆÂâçÁÇ∫Ê≠¢ËÆÄÂèñÁöÑÂ≠óÊÆµÊï∏)
-       pre = 0; // locate one field of input record (ÂÆö‰ΩçËº∏ÂÖ•Ë®òÈåÑÁöÑ‰∏ÄÂÄãÂ≠óÊÆµ) Á¨¨ÂπæÂÄã‰ΩçÁΩÆ
+       fNo = 0; // number of fields read so far 
+       pre = 0; // locate one field of input record 
        buf.assign(cstr); // copy c-string into C++ string
    
        do{ // scan the buf from left to right
-         pos = buf.find_first_of('\t',pre) ; // Âæûpre‰ΩçÁΩÆÈñãÂßãÊâæ'\t',Â¶ÇÊûúÊâæÂà∞'\t'‰∏≠‰ªª‰∏ÄÂ≠óÂÖÉ Â∞±ËøîÂõû‰ªñÂú®buf‰∏≠ÁöÑÈô£ÂàóÂÄº
-         cut = buf.substr(pre,pos - pre); // Âæûbuf‰∏≠Á¨¨pre‰ΩçÈñãÂßãÁöÑÈï∑Â∫¶ÁÇ∫pos-preÁöÑÂ≠ó‰∏≤  //retrieve a field
-         switch(++fNo){  // fNoÁÇ∫Á¨¨ÂπæÁ≠ÜË≥áÊñô
+         pos = buf.find_first_of('\t',pre) ; 
+         cut = buf.substr(pre,pos - pre); 
+         switch(++fNo){  
            case 2: oneR.Name = cut;  // get school name
              break;
            case 4: oneR.Department_name = cut; // get the Department_name
